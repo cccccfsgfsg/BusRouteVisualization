@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace BusRouteVisualization
 {
-    public partial class Маршрут : Form
+    public partial class Form1 : Form
     {
         private List<BusRoute> routes = new List<BusRoute>();
         private BusRoute selectedRoute;
@@ -14,14 +16,15 @@ namespace BusRouteVisualization
         private int currentPointIndex = 0;
         private float animationProgress = 0f;
         private PointF busPosition;
+        private const string FilePath = "routes.json"; // Путь к файлу JSON
 
-        public Маршрут()
+        public Form1()
         {
             InitializeComponent();
             picMap.Width = 541;
             picMap.Height = 368;
             picMap.MouseClick += PicMap_MouseClick;
-            LoadTestData();
+            LoadRoutesFromFile(); // Загружаем маршруты при старте
             InitializeAnimationTimer();
         }
 
@@ -34,25 +37,64 @@ namespace BusRouteVisualization
             animationTimer.Tick += AnimationTimer_Tick;
         }
 
+        private void LoadRoutesFromFile()
+        {
+            if (File.Exists(FilePath))
+            {
+                try
+                {
+                    string jsonString = File.ReadAllText(FilePath);
+                    routes = JsonConvert.DeserializeObject<List<BusRoute>>(jsonString);
+                    if (routes != null)
+                    {
+                        cmbRoutes.DataSource = null;
+                        cmbRoutes.DataSource = routes;
+                        cmbRoutes.DisplayMember = "Name";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка загрузки маршрутов: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void SaveRoutesToFile()
+        {
+            try
+            {
+                string jsonString = JsonConvert.SerializeObject(routes, Formatting.Indented);
+                File.WriteAllText(FilePath, jsonString);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка сохранения маршрутов: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void LoadTestData()
         {
-            var route1 = new BusRoute { Id = 1, Name = "Маршрут 1: Центр - Периферия" };
-            route1.Points.Add(new RoutePoint { Id = 1, Name = "Центральная площадь", X = 50, Y = 50, TimeFromStart = TimeSpan.FromMinutes(0) });
-            route1.Points.Add(new RoutePoint { Id = 2, Name = "Улица Ленина", X = 150, Y = 100, TimeFromStart = TimeSpan.FromMinutes(5) });
-            route1.Points.Add(new RoutePoint { Id = 3, Name = "Торговый центр", X = 300, Y = 150, TimeFromStart = TimeSpan.FromMinutes(10) });
-            route1.Points.Add(new RoutePoint { Id = 4, Name = "Жилой район", X = 450, Y = 300, TimeFromStart = TimeSpan.FromMinutes(20) });
+            if (routes.Count == 0) // Добавляем тестовые данные только если файл пуст
+            {
+                var route1 = new BusRoute { Id = 1, Name = "Маршрут 1: Центр - Периферия" };
+                route1.Points.Add(new RoutePoint { Id = 1, Name = "Центральная площадь", X = 50, Y = 50, TimeFromStart = TimeSpan.FromMinutes(0) });
+                route1.Points.Add(new RoutePoint { Id = 2, Name = "Улица Ленина", X = 150, Y = 100, TimeFromStart = TimeSpan.FromMinutes(5) });
+                route1.Points.Add(new RoutePoint { Id = 3, Name = "Торговый центр", X = 300, Y = 150, TimeFromStart = TimeSpan.FromMinutes(10) });
+                route1.Points.Add(new RoutePoint { Id = 4, Name = "Жилой район", X = 450, Y = 300, TimeFromStart = TimeSpan.FromMinutes(20) });
 
-            var route2 = new BusRoute { Id = 2, Name = "Маршрут 2: Вокзал - Аэропорт" };
-            route2.Points.Add(new RoutePoint { Id = 5, Name = "Вокзал", X = 30, Y = 30, TimeFromStart = TimeSpan.FromMinutes(0) });
-            route2.Points.Add(new RoutePoint { Id = 6, Name = "Шоссе", X = 200, Y = 50, TimeFromStart = TimeSpan.FromMinutes(10) });
-            route2.Points.Add(new RoutePoint { Id = 7, Name = "Аэропорт", X = 500, Y = 20, TimeFromStart = TimeSpan.FromMinutes(25) });
+                var route2 = new BusRoute { Id = 2, Name = "Маршрут 2: Вокзал - Аэропорт" };
+                route2.Points.Add(new RoutePoint { Id = 5, Name = "Вокзал", X = 30, Y = 30, TimeFromStart = TimeSpan.FromMinutes(0) });
+                route2.Points.Add(new RoutePoint { Id = 6, Name = "Шоссе", X = 200, Y = 50, TimeFromStart = TimeSpan.FromMinutes(10) });
+                route2.Points.Add(new RoutePoint { Id = 7, Name = "Аэропорт", X = 500, Y = 20, TimeFromStart = TimeSpan.FromMinutes(25) });
 
-            routes.Add(route1);
-            routes.Add(route2);
+                routes.Add(route1);
+                routes.Add(route2);
 
-            cmbRoutes.DataSource = null;
-            cmbRoutes.DataSource = routes;
-            cmbRoutes.DisplayMember = "Name";
+                cmbRoutes.DataSource = null;
+                cmbRoutes.DataSource = routes;
+                cmbRoutes.DisplayMember = "Name";
+                SaveRoutesToFile(); // Сохраняем тестовые данные в файл
+            }
         }
 
         private void BtnAddPoint_Click(object sender, EventArgs e)
@@ -106,6 +148,7 @@ namespace BusRouteVisualization
             cmbRoutes.DisplayMember = "Name";
             cmbRoutes.SelectedItem = newRoute;
             selectedRoute = newRoute;
+            SaveRoutesToFile(); // Сохраняем после создания нового маршрута
             MessageBox.Show($"Маршрут {routeName} создан. Добавляйте точки.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -229,6 +272,11 @@ namespace BusRouteVisualization
                 txtRouteName.Text = "Название маршрута";
                 txtRouteName.ForeColor = Color.Gray;
             }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveRoutesToFile(); // Сохраняем маршруты при закрытии формы
         }
     }
 

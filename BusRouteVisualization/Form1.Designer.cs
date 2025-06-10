@@ -1,6 +1,6 @@
 ﻿namespace BusRouteVisualization
 {
-    partial class Маршрут
+    partial class Form1
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -34,7 +34,6 @@
             this.btnAnimate = new System.Windows.Forms.Button();
             this.Timer = new System.Windows.Forms.Timer(this.components);
             this.cmbRoutes = new System.Windows.Forms.ComboBox();
-            this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.btnAddPoint = new System.Windows.Forms.Button();
             this.btnCreateRoute = new System.Windows.Forms.Button();
             this.txtRouteName = new System.Windows.Forms.TextBox();
@@ -77,14 +76,6 @@
             this.cmbRoutes.Size = new System.Drawing.Size(124, 21);
             this.cmbRoutes.TabIndex = 3;
             // 
-            // statusStrip
-            // 
-            this.statusStrip.Location = new System.Drawing.Point(0, 444);
-            this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(800, 22);
-            this.statusStrip.TabIndex = 4;
-            this.statusStrip.Text = "statusStrip1";
-            // 
             // btnAddPoint
             // 
             this.btnAddPoint.Location = new System.Drawing.Point(59, 398);
@@ -122,7 +113,6 @@
             this.Controls.Add(this.txtRouteName);
             this.Controls.Add(this.btnCreateRoute);
             this.Controls.Add(this.btnAddPoint);
-            this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.cmbRoutes);
             this.Controls.Add(this.btnAnimate);
             this.Controls.Add(this.btnLoadRoute);
@@ -144,7 +134,6 @@
         private System.Windows.Forms.Button btnAnimate;
         private System.Windows.Forms.Timer Timer;
         private System.Windows.Forms.ComboBox cmbRoutes;
-        private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.Button btnAddPoint;
         private System.Windows.Forms.Button btnCreateRoute;
         private System.Windows.Forms.TextBox txtRouteName;
