@@ -431,14 +431,14 @@ namespace BusRouteVisualization
             return textBox.Text;
         }
     }
-
+//Он в отдельном классе
     public class BusRoute
     {
         public int Id { get; set; } // Уникальный идентификатор маршрута
         public string Name { get; set; } // Название маршрута
         public List<RoutePoint> Points { get; set; } = new List<RoutePoint>(); // Список точек маршрута
     }
-
+//Он в отдельном классе
     public class RoutePoint
     {
         public int Id { get; set; } // Уникальный идентификатор точки
